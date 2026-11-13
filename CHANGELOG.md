@@ -27,7 +27,9 @@ screenshots of every page.
 - `reactapp/scripts/test-api.js`, a harness that runs the serverless
   functions locally so their behaviour can be verified without a deployment.
 - Screenshots of every page of the application in `docs/screenshots`, used by
-  the README.
+  the README. The gallery is a centred two column grid of the four landscape
+  screens, with the portrait mobile capture centred below it, so that no
+  caption or image is pushed out of line.
 - The Spring Boot API publishes the two endpoints of the problem statement
   below `/api` as well, so the same client reaches either backend without a
   rebuild.
