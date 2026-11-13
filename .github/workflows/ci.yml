@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: Backend - build & test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: springapp
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Build the application
+        run: mvn -B -DskipTests package
+
+      - name: Run the test suite
+        run: mvn -B test
+
+  frontend:
+    name: Frontend - lint, test & build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: reactapp
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: npm
+          cache-dependency-path: reactapp/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run the test suite
+        run: npm test -- --watchAll=false
+        env:
+          CI: true
+
+      - name: Build the production bundle
+        run: npm run build
