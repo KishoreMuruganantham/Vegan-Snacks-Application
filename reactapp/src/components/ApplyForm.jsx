@@ -1,0 +1,13 @@
+import React,{useState} from 'react';
+import {Link,useNavigate} from 'react-router-dom';
+import API_URL from '../apiConfig';
+function ApplyForm(){
+ const navigate=useNavigate();
+ const [formData,setFormData]=useState({snackName:'',snackType:'',quantity:'',price:'',expiryInMonths:''});
+ const [errors,setErrors]=useState({}); const [success,setSuccess]=useState(false);
+ const handleChange=e=>setFormData({...formData,[e.target.name]:e.target.value});
+ const validate=()=>{const e={}; if(!formData.snackName.trim())e.snackName='Snack Name is required'; if(!formData.snackType.trim())e.snackType='Snack Type is required'; if(!formData.quantity.trim())e.quantity='Quantity is required'; if(formData.price==='')e.price='Price is required'; else if(Number(formData.price)<=0)e.price='Price must be a positive number'; if(formData.expiryInMonths==='')e.expiryInMonths='Expiry in months is required'; else if(Number(formData.expiryInMonths)<0)e.expiryInMonths='Expiry must be a non-negative number'; setErrors(e); return Object.keys(e).length===0;};
+ const handleSubmit=async e=>{e.preventDefault();if(!validate())return;const data={...formData,price:Number(formData.price),expiryInMonths:Number(formData.expiryInMonths)};try{const response=await fetch(API_URL+'/addVeganSnack',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});if(!response.ok)throw new Error(await response.text());setFormData({snackName:'',snackType:'',quantity:'',price:'',expiryInMonths:''});setSuccess(true);}catch(err){console.error(err);setErrors({submit:err.message||'Unable to submit snack'});}};
+ return <section className="form-container"><Link className="back-link" to="/getAllVeganSnacks">Back</Link><h2>Add a Vegan Snack</h2><form onSubmit={handleSubmit} noValidate>{[['snackName','Snack Name:','text'],['snackType','Snack Type:','text'],['quantity','Quantity:','text'],['price','Price:','number'],['expiryInMonths','Expiry (in months):','number']].map(([name,label,type])=><div className="form-group" key={name}><label htmlFor={name}>{label}</label><input id={name} name={name} type={type} value={formData[name]} onChange={handleChange}/>{errors[name]&&<small className="error">{errors[name]}</small>}</div>)}{errors.submit&&<p className="error">{errors.submit}</p>}<button className="submit-button" type="submit">Submit</button></form>{success&&<div className="modal-backdrop"><div className="success-modal"><h3>Success</h3><p>Snack submitted successfully!</p><button onClick={()=>{setSuccess(false);navigate('/getAllVeganSnacks');}}>OK</button></div></div>}</section>;
+}
+export default ApplyForm;
