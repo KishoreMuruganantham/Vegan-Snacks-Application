@@ -9,6 +9,9 @@
 # Production
 /build
 
+# Vercel CLI
+/.vercel
+
 # Local environment overrides (the shared .env file is committed on purpose)
 .env.local
 .env.development.local
@@ -28,3 +31,5 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 desktop.ini
+
+.vercel

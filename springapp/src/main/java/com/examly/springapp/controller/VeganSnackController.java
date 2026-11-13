@@ -37,10 +37,15 @@ public class VeganSnackController {
     /**
      * Stores a new catalogue entry.
      *
+     * <p>The endpoint is published on the path of the problem statement and on a path below
+     * {@code /api}. The second path lets the client address the backend below a prefix, which
+     * keeps the API of a hosted deployment clear of the routes of the single page application
+     * without the client having to know where it is running.</p>
+     *
      * @param request payload submitted by the client
      * @return the stored catalogue entry
      */
-    @PostMapping("/addVeganSnack")
+    @PostMapping({ "/addVeganSnack", "/api/addVeganSnack" })
     public ResponseEntity<VeganSnackResponse> addVeganSnack(@RequestBody VeganSnackRequest request) {
         return ResponseEntity.ok(veganSnackService.addVeganSnack(request));
     }
@@ -50,7 +55,7 @@ public class VeganSnackController {
      *
      * @return the catalogue entries, never {@code null}
      */
-    @GetMapping("/getAllVeganSnacks")
+    @GetMapping({ "/getAllVeganSnacks", "/api/getAllVeganSnacks" })
     public ResponseEntity<List<VeganSnackResponse>> getAllVeganSnacks() {
         return ResponseEntity.ok(veganSnackService.getAllVeganSnacks());
     }

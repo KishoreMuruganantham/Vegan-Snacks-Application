@@ -1,0 +1,22 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "create-react-app",
+  "installCommand": "npm install",
+  "buildCommand": "npm run build",
+  "outputDirectory": "build",
+  "build": {
+    "env": {
+      "REACT_APP_API_BASE_URL": ""
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/apply",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/getAllVeganSnacks",
+      "destination": "/index.html"
+    }
+  ]
+}

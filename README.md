@@ -10,10 +10,18 @@
 [![H2 Database](https://img.shields.io/badge/H2-In--Memory-0F4C81?style=for-the-badge&logo=h2database&logoColor=white)](https://www.h2database.com/)
 [![Maven](https://img.shields.io/badge/Maven-3.9-C71A36?style=for-the-badge&logo=apache-maven&logoColor=white)](https://maven.apache.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-8A2BE2?style=for-the-badge)](LICENSE)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vegan-snacks-application-virid.vercel.app)
 
 A single-vendor streaming experience for showcasing vegan snacks. Vendors fill
 in a validated online form; the catalogue is persisted, enriched with derived
 business metadata and rendered as a responsive, searchable dashboard.
+
+### Try the live demo
+
+**[vegan-snacks-application-virid.vercel.app](https://vegan-snacks-application-virid.vercel.app)**
+
+Deployed on the [Vercel Hobby plan](https://vercel.com/docs/plans/hobby) - free,
+with no billing cycle and no card on file.
 
 </div>
 
@@ -21,6 +29,8 @@ business metadata and rendered as a responsive, searchable dashboard.
 
 ## 📖 Table of Contents
 
+- [Live Demo](#live-demo)
+- [Screenshots](#-screenshots)
 - [Problem Statement](#-problem-statement)
 - [Feature Highlights](#-feature-highlights)
 - [Technology Stack](#-technology-stack)
@@ -30,6 +40,7 @@ business metadata and rendered as a responsive, searchable dashboard.
 - [Project Structure](#-project-structure)
 - [Prerequisites](#-prerequisites)
 - [Getting Started](#-getting-started)
+- [Deployment](#-deployment)
 - [API Reference](#-api-reference)
 - [Validation Rules](#-validation-rules)
 - [Design System](#-design-system)
@@ -38,6 +49,15 @@ business metadata and rendered as a responsive, searchable dashboard.
 - [Contributing](#-contributing)
 - [License](#-license)
 - [Project Status](#-project-status)
+
+---
+
+## 📸 Screenshots
+
+| **Landing page** - hero, feature grid and live catalogue statistics<br><img src="docs/screenshots/01-home.png" width="460" alt="Landing page with the deep green hero"> | **Catalogue** - live search, type filter, sorting and summary strip<br><img src="docs/screenshots/02-catalogue.png" width="460" alt="The vegan snack catalogue"> |
+|---|---|---|
+| **Add a Snack** - validated form with a live preview card<br><img src="docs/screenshots/03-add-a-snack.png" width="460" alt="The add a vegan snack form"> | **Validation** - every field reports its own message at once<br><img src="docs/screenshots/04-validation.png" width="460" alt="The form showing the validation messages"> |
+| **Mobile** - the transparent header and the catalogue adapt to a phone<br><img src="docs/screenshots/05-mobile.png" width="300" alt="The application on a mobile viewport"> | |
 
 ---
 
@@ -346,6 +366,8 @@ Vegan-Snacks-Application/
 ├── CHANGELOG.md                     # Release notes
 ├── LICENSE                          # MIT licence
 ├── README.md                        # You are here
+├── docs/
+│   └── screenshots/                 # Screenshots used by this file
 │
 ├── springapp/                       # Spring Boot 3.2.5 - Java 17 - port 8080
 │   ├── pom.xml
@@ -372,8 +394,18 @@ Vegan-Snacks-Application/
 │
 └── reactapp/                        # React 18.3 - react-router-dom 6.26 - port 8081
     ├── package.json
-    ├── .env                         # PORT=8081, HOST=0.0.0.0, BROWSER=none
+    ├── .env                         # Shared build settings
+    ├── .env.development             # Settings of the local dev server (PORT=8081)
+    ├── vercel.json                  # Configuration of the Vercel deployment
     ├── public/                      # index.html, favicon.svg, manifest.json, robots.txt
+    ├── api/                         # Serverless API of the hosted deployment
+    │   ├── _catalogue.js            # Domain rules and the in-memory catalogue
+    │   ├── getAllVeganSnacks.js     # GET  /api/getAllVeganSnacks
+    │   ├── addVeganSnack.js         # POST /api/addVeganSnack
+    │   └── v1/
+    │       ├── health.js            # GET  /api/v1/health
+    │       └── snacks/stats.js      # GET  /api/v1/snacks/stats
+    ├── scripts/                     # Cross platform launcher and the API test harness
     └── src/
         ├── index.js                 # React entry point
         ├── index.css                # Design tokens + global styles
@@ -411,6 +443,9 @@ Vegan-Snacks-Application/
 ---
 
 ## 🚀 Getting Started
+
+> **Just want to see it?** Open the [live demo](https://vegan-snacks-application-virid.vercel.app).
+> To run it on your machine, follow the steps below.
 
 ### 1. Clone the repository
 
@@ -490,6 +525,91 @@ java -jar springapp/target/springapp.jar
 
 ---
 
+## ☁️ Deployment
+
+**Live URL** — <https://vegan-snacks-application-virid.vercel.app>
+
+### Architecture of the hosted deployment
+
+```mermaid
+graph LR
+    Browser["Browser"]
+    Static["React client<br/>static bundle on the CDN"]
+    Fn["Serverless API<br/>/api/*"]
+    Memory[("In-memory<br/>catalogue")]
+
+    Browser -->|HTML, JS, CSS| Static
+    Browser -->|fetch JSON| Fn
+    Fn --> Memory
+
+    classDef edge fill:#EAF0FA,stroke:#0F4C81,color:#0B2E1F
+    classDef fn fill:#FFF6E3,stroke:#E09B26,color:#5A3A08
+    class Browser edge
+    class Static,Fn,Memory fn
+```
+
+Vercel runs **Node.js serverless functions**, not a JVM, so the Spring Boot
+service cannot be hosted there directly. The deployment therefore ships:
+
+| Piece | Where it runs | Source |
+|-------|---------------|--------|
+| The React client | static bundle on the Vercel CDN | `reactapp/src` |
+| The catalogue API | Vercel serverless functions | `reactapp/api` |
+| The catalogue data | in memory, per function instance | `reactapp/api/_catalogue.js` |
+
+`reactapp/api` implements **exactly the same contract as the Spring Boot API** —
+the same paths, the same validation messages, the same category resolution and
+the same derived pricing, freshness and valuation figures. The Spring Boot
+application stays the canonical implementation and is what runs locally.
+
+### One client, two backends
+
+`reactapp/src/apiConfig.js` resolves the base URL of the backend once:
+
+```text
+REACT_APP_API_BASE_URL set   -> that value (a hosted build sets it to an empty
+                                string, which makes every call relative)
+running on localhost          -> http://localhost:8080   (the Spring Boot API)
+anything else                -> the origin of the page   (the serverless API)
+```
+
+The Spring Boot API publishes the endpoints on both the path of the problem
+statement and a path below `/api`, so the same client works against both
+backends without a rebuild:
+
+| Endpoint | Spring Boot | Vercel function |
+|----------|--------------|-----------------|
+| `GET` | `/getAllVeganSnacks` and `/api/getAllVeganSnacks` | `/api/getAllVeganSnacks` |
+| `POST` | `/addVeganSnack` and `/api/addVeganSnack` | `/api/addVeganSnack` |
+| `GET` | `/api/v1/snacks/stats` | `/api/v1/snacks/stats` |
+| `GET` | `/api/v1/health` | `/api/v1/health` |
+
+### Deploying it yourself
+
+```bash
+cd reactapp
+npm install -g vercel
+vercel login
+vercel --prod
+```
+
+The Vercel project is configured entirely by `reactapp/vercel.json`, so no
+dashboard changes are needed.
+
+### Cost
+
+The project runs on the **Vercel Hobby plan**, which is free:
+
+- *"The Hobby plan is a **free** tier there are no billing cycles."* —
+  [Vercel pricing](https://vercel.com/docs/plans/hobby)
+- No card is on file and no invoice is raised.
+- Included every month: 100 GB of data transfer, 1,000,000 CDN requests,
+  1,000,000 function invocations, 4 CPU-hours and 360 GB-hours of memory.
+- If a limit is ever reached, the affected feature pauses until the window
+  resets — it is never billed.
+
+---
+
 ## 🔌 API Reference
 
 Base URL `http://localhost:8080` · All payloads are JSON ·
@@ -501,6 +621,11 @@ Base URL `http://localhost:8080` · All payloads are JSON ·
 |--------|----------|-------------|---------|
 | `GET` | `/getAllVeganSnacks` | List every snack, newest first | `200` + array |
 | `POST` | `/addVeganSnack` | Register a new snack | `200` + created snack |
+
+Both endpoints are also published below `/api` — `/api/getAllVeganSnacks` and
+`/api/addVeganSnack` — so the client can address the Spring Boot API and the
+serverless API of the hosted deployment through the same paths. See
+[Deployment](#-deployment).
 
 <details>
 <summary><strong>Response shape</strong> — <code>VeganSnackResponse</code></summary>

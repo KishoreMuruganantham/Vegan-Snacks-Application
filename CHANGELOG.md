@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.0] - 2026-11-13
+
+The application is now hosted on Vercel and the repository carries the
+screenshots of every page.
+
+### Added
+
+- **A live deployment** on the [Vercel Hobby plan](https://vercel.com/docs/plans/hobby)
+  at <https://vegan-snacks-application-virid.vercel.app>. The plan is free,
+  has no billing cycle and no card on file.
+- A serverless API in `reactapp/api` that implements exactly the contract of
+  the Spring Boot API — the same paths, the same validation messages, the
+  same category resolution and the same derived pricing, freshness and
+  valuation figures. It keeps the catalogue in memory, so the deployment
+  needs no external database.
+- `reactapp/vercel.json`, which configures the build, the output directory,
+  the client side routes and the build time environment of the deployment.
+- `reactapp/scripts/test-api.js`, a harness that runs the serverless
+  functions locally so their behaviour can be verified without a deployment.
+- Screenshots of every page of the application in `docs/screenshots`, used by
+  the README.
+- The Spring Boot API publishes the two endpoints of the problem statement
+  below `/api` as well, so the same client reaches either backend without a
+  rebuild.
+
+### Changed
+
+- `reactapp/src/apiConfig.js` resolves the base URL of the backend from the
+  build time configuration, from the hostname of the page or from the
+  `REACT_APP_API_BASE_URL` variable, in that order. The client therefore
+  points at the Spring Boot API during local development and at the
+  serverless API of the deployment everywhere else.
+- The settings of the development server moved from `reactapp/.env` to
+  `reactapp/.env.development`, so they no longer leak into the production
+  build.
+- The README carries the live demo, the screenshots and a section that
+  explains the architecture of the deployment and its cost.
+
+---
+
 ## [1.1.1] - 2026-11-13
 
 ### Changed

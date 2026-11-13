@@ -2,6 +2,7 @@ import React from 'react';
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from '../App';
+import { API_BASE_URL, API_ENDPOINTS } from '../apiConfig';
 
 const SAMPLE_SNACKS = [
   {
@@ -36,7 +37,12 @@ const SAMPLE_SNACKS = [
   },
 ];
 
-const ADD_SNACK_URL = 'http://localhost:8080/addVeganSnack';
+/**
+ * The URL of the submission endpoint. It is built from the shared API
+ * configuration so that the test follows the client wherever it is pointed.
+ * During the test run the configuration resolves to the local Spring Boot API.
+ */
+const ADD_SNACK_URL = `${API_BASE_URL}${API_ENDPOINTS.ADD_SNACK}`;
 
 /** Builds a minimal Response-like object for the mocked fetch. */
 const buildResponse = (payload, status = 200) => ({
@@ -211,6 +217,19 @@ describe('Vegan Snacks Application', () => {
     expect(
       screen.getByText('© 2024 Vegan Snacks Application. All rights reserved.')
     ).toBeInTheDocument();
+  });
+
+  test('addresses the backend through the shared endpoint configuration', () => {
+    // The endpoints keep the names of the problem statement, so the client
+    // reaches the same API whether it runs locally or on a hosting platform.
+    expect(API_ENDPOINTS.GET_ALL_SNACKS).toContain('/getAllVeganSnacks');
+    expect(API_ENDPOINTS.ADD_SNACK).toContain('/addVeganSnack');
+    expect(API_ENDPOINTS.STATS).toContain('/api/v1/snacks/stats');
+    expect(API_ENDPOINTS.HEALTH).toContain('/api/v1/health');
+
+    // The test runs on a development machine, so the configuration points at
+    // the Spring Boot API on port 8080.
+    expect(API_BASE_URL).toBe('http://localhost:8080');
   });
 
   test('lists the catalogue with formatted values', async () => {
