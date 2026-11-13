@@ -54,10 +54,16 @@ with no billing cycle and no card on file.
 
 ## 📸 Screenshots
 
-| **Landing page** - hero, feature grid and live catalogue statistics<br><img src="docs/screenshots/01-home.png" width="460" alt="Landing page with the deep green hero"> | **Catalogue** - live search, type filter, sorting and summary strip<br><img src="docs/screenshots/02-catalogue.png" width="460" alt="The vegan snack catalogue"> |
-|---|---|---|
-| **Add a Snack** - validated form with a live preview card<br><img src="docs/screenshots/03-add-a-snack.png" width="460" alt="The add a vegan snack form"> | **Validation** - every field reports its own message at once<br><img src="docs/screenshots/04-validation.png" width="460" alt="The form showing the validation messages"> |
-| **Mobile** - the transparent header and the catalogue adapt to a phone<br><img src="docs/screenshots/05-mobile.png" width="300" alt="The application on a mobile viewport"> | |
+| | |
+|:---:|:---:|
+| **Landing page**<br>Hero, feature grid and live catalogue statistics<br><img src="docs/screenshots/01-home.png" width="470" alt="Landing page with the deep green hero"> | **Catalogue**<br>Live search, type filter, sorting and a summary strip<br><img src="docs/screenshots/02-catalogue.png" width="470" alt="The vegan snack catalogue"> |
+| **Add a Snack**<br>Validated form with a live preview card<br><img src="docs/screenshots/03-add-a-snack.png" width="470" alt="The add a vegan snack form"> | **Validation**<br>Every field reports its own message at once<br><img src="docs/screenshots/04-validation.png" width="470" alt="The form showing the validation messages"> |
+
+<p align="center">
+  <strong>Mobile layout</strong><br>
+  <em>The transparent header and the catalogue adapt to a phone</em><br>
+  <img src="docs/screenshots/05-mobile.png" width="290" alt="The application on a mobile viewport" align="center">
+</p>
 
 ---
 
