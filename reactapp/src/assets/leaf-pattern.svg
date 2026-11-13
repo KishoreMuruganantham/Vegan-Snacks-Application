@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" aria-hidden="true">
+  <defs>
+    <pattern id="leafPattern" width="120" height="120" patternUnits="userSpaceOnUse" patternTransform="rotate(14)">
+      <g transform="translate(30 12) scale(0.42)" fill="none" stroke="#186A43" stroke-width="2.4" opacity="0.18">
+        <path d="M110 8c58 40 84 106 36 178-12 18-30 26-46 26 22-38 30-80 22-126-22 30-52 48-90 54 6-50 32-98 78-132z" />
+        <path d="M110 20v180" stroke-linecap="round" />
+      </g>
+    </pattern>
+  </defs>
+  <rect width="240" height="240" fill="url(#leafPattern)" />
+</svg>

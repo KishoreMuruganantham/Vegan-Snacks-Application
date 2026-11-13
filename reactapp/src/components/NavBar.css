@@ -1,0 +1,145 @@
+/* ==========================================================================
+   Sticky application header and primary navigation.
+   ========================================================================== */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid var(--hairline);
+  background: rgba(251, 250, 244, 0.86);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.site-nav {
+  width: 100%;
+}
+
+.site-nav__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  max-width: var(--shell-max);
+  margin-inline: auto;
+  padding: 0.75rem var(--gutter);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--green-900);
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.brand__mark {
+  flex: 0 0 auto;
+  width: 2.1rem;
+  height: 2.1rem;
+}
+
+.brand__text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav-list {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.nav-list__item {
+  display: flex;
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 0.85rem;
+  border-radius: var(--radius-pill);
+  color: var(--ink-600);
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    background-color var(--transition),
+    color var(--transition);
+}
+
+.nav-link:hover {
+  background: var(--cream-100);
+  color: var(--green-800);
+}
+
+.nav-link.active {
+  background: var(--cream-200);
+  color: var(--green-900);
+}
+
+/* The call to action is the last item on every viewport. */
+.nav-list__item--cta .nav-link {
+  background: linear-gradient(135deg, var(--green-700), var(--green-600));
+  box-shadow: var(--shadow-sm);
+  color: var(--white);
+  padding: 0.55rem 1.1rem;
+}
+
+.nav-list__item--cta .nav-link:hover {
+  background: linear-gradient(135deg, var(--green-800), var(--green-700));
+  color: var(--white);
+}
+
+.nav-list__item--cta .nav-link.active {
+  background: linear-gradient(135deg, var(--green-800), var(--green-700));
+  box-shadow: var(--shadow-md);
+  color: var(--white);
+}
+
+@media (max-width: 720px) {
+  .site-nav__inner {
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+  }
+
+  .brand {
+    font-size: 0.95rem;
+  }
+
+  .brand__mark {
+    width: 1.9rem;
+    height: 1.9rem;
+  }
+
+  .nav-list {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 0.25rem;
+  }
+
+  .nav-link {
+    padding: 0.45rem 0.7rem;
+    font-size: 0.86rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .brand__text {
+    font-size: 0.9rem;
+  }
+
+  .nav-list {
+    justify-content: space-between;
+  }
+}

@@ -1,1 +1,43 @@
-{"name":"vegan-snacks-app","version":"1.0.0","private":true,"dependencies":{"react":"^18.2.0","react-dom":"^18.2.0","react-router-dom":"^6.22.3","react-scripts":"5.0.1"},"scripts":{"start":"PORT=8081 react-scripts start","build":"react-scripts build","test":"react-scripts test"},"browserslist":{"production":[">0.2%","not dead"],"development":["last 1 chrome version"]}}
+{
+  "name": "vegan-snacks-application",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Vegan Snacks Application - React.js frontend for the Hexaware FSD case study.",
+  "dependencies": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-router-dom": "^6.26.2"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^14.5.2",
+    "react-scripts": "5.0.1"
+  },
+  "scripts": {
+    "start": "node scripts/cra.js start",
+    "build": "node scripts/cra.js build",
+    "test": "node scripts/cra.js test --watchAll=false",
+    "test:watch": "node scripts/cra.js test",
+    "test:ci": "node scripts/cra.js test --watchAll=false"
+  },
+  "proxy": "http://localhost:8080",
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

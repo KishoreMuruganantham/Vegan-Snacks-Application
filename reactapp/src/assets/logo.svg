@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="Vegan Snacks Application logo">
+  <defs>
+    <linearGradient id="logoLeaf" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8ADCA1" />
+      <stop offset="100%" stop-color="#C3F05C" />
+    </linearGradient>
+  </defs>
+  <circle cx="80" cy="80" r="78" fill="#0B2E1F" />
+  <path
+    d="M106 40c4 32-11 58-39 63-10 2-18-1-25-7 19-3 31-14 36-33-11 8-23 11-36 9 9-16 28-31 64-32z"
+    fill="url(#logoLeaf)"
+  />
+  <path
+    d="M43 120c13-22 31-38 55-48"
+    fill="none"
+    stroke="#0B2E1F"
+    stroke-width="4"
+    stroke-linecap="round"
+    opacity=".5"
+  />
+</svg>

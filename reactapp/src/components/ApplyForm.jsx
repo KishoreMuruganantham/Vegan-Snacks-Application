@@ -1,13 +1,215 @@
-import React,{useState} from 'react';
-import {Link,useNavigate} from 'react-router-dom';
-import API_URL from '../apiConfig';
-function ApplyForm(){
- const navigate=useNavigate();
- const [formData,setFormData]=useState({snackName:'',snackType:'',quantity:'',price:'',expiryInMonths:''});
- const [errors,setErrors]=useState({}); const [success,setSuccess]=useState(false);
- const handleChange=e=>setFormData({...formData,[e.target.name]:e.target.value});
- const validate=()=>{const e={}; if(!formData.snackName.trim())e.snackName='Snack Name is required'; if(!formData.snackType.trim())e.snackType='Snack Type is required'; if(!formData.quantity.trim())e.quantity='Quantity is required'; if(formData.price==='')e.price='Price is required'; else if(Number(formData.price)<=0)e.price='Price must be a positive number'; if(formData.expiryInMonths==='')e.expiryInMonths='Expiry in months is required'; else if(Number(formData.expiryInMonths)<0)e.expiryInMonths='Expiry must be a non-negative number'; setErrors(e); return Object.keys(e).length===0;};
- const handleSubmit=async e=>{e.preventDefault();if(!validate())return;const data={...formData,price:Number(formData.price),expiryInMonths:Number(formData.expiryInMonths)};try{const response=await fetch(API_URL+'/addVeganSnack',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});if(!response.ok)throw new Error(await response.text());setFormData({snackName:'',snackType:'',quantity:'',price:'',expiryInMonths:''});setSuccess(true);}catch(err){console.error(err);setErrors({submit:err.message||'Unable to submit snack'});}};
- return <section className="form-container"><Link className="back-link" to="/getAllVeganSnacks">Back</Link><h2>Add a Vegan Snack</h2><form onSubmit={handleSubmit} noValidate>{[['snackName','Snack Name:','text'],['snackType','Snack Type:','text'],['quantity','Quantity:','text'],['price','Price:','number'],['expiryInMonths','Expiry (in months):','number']].map(([name,label,type])=><div className="form-group" key={name}><label htmlFor={name}>{label}</label><input id={name} name={name} type={type} value={formData[name]} onChange={handleChange}/>{errors[name]&&<small className="error">{errors[name]}</small>}</div>)}{errors.submit&&<p className="error">{errors.submit}</p>}<button className="submit-button" type="submit">Submit</button></form>{success&&<div className="modal-backdrop"><div className="success-modal"><h3>Success</h3><p>Snack submitted successfully!</p><button onClick={()=>{setSuccess(false);navigate('/getAllVeganSnacks');}}>OK</button></div></div>}</section>;
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useSnackContext } from '../context/SnackContext';
+import useSnackForm from '../hooks/useSnackForm';
+import { formatCurrency, formatExpiry, formatQuantity } from '../utils/formatters';
+import './ApplyForm.css';
+
+/**
+ * Maximum length of a snack name. It mirrors the limit enforced by the
+ * backend validator so the client never submits a name the API would reject.
+ */
+const NAME_MAX_LENGTH = 60;
+
+/**
+ * Field metadata for the form. The ids double as the input `name`, so the
+ * submitted payload always matches the contract expected by the backend.
+ */
+const FIELDS = [
+  {
+    name: 'snackName',
+    label: 'Snack Name:',
+    type: 'text',
+    placeholder: 'e.g. Roasted Almonds',
+    autoComplete: 'off',
+    maxLength: NAME_MAX_LENGTH,
+  },
+  {
+    name: 'snackType',
+    label: 'Snack Type:',
+    type: 'text',
+    placeholder: 'e.g. Nuts and Seeds',
+    autoComplete: 'off',
+  },
+  {
+    name: 'quantity',
+    label: 'Quantity:',
+    type: 'number',
+    placeholder: 'e.g. 25',
+    min: '1',
+    step: '1',
+  },
+  {
+    name: 'price',
+    label: 'Price:',
+    type: 'number',
+    placeholder: 'e.g. 149.50',
+    min: '0.01',
+    step: '0.01',
+  },
+  {
+    name: 'expiryInMonths',
+    label: 'Expiry (in months):',
+    type: 'number',
+    placeholder: 'e.g. 6',
+    min: '0',
+    step: '1',
+  },
+];
+
+/**
+ * Form used to register a new vegan snack in the catalogue.
+ */
+function ApplyForm() {
+  const navigate = useNavigate();
+  const { showToast, refresh } = useSnackContext();
+
+  const { values, errors, submitError, isSubmitting, handleChange, submit } = useSnackForm({
+    onSuccess: () => {
+      // The toast lives outside the router outlet, so the confirmation stays
+      // visible on the page the user is redirected to.
+      showToast({
+        type: 'success',
+        title: 'Snack added',
+        message: 'Snack submitted successfully!',
+      });
+
+      refresh();
+      navigate('/getAllVeganSnacks');
+    },
+  });
+
+  const nameLength = values.snackName.length;
+
+  return (
+    <section className="apply">
+      <div className="container apply__inner">
+        <div className="apply__main">
+          <button
+            type="button"
+            className="button button--ghost apply__back"
+            onClick={() => navigate('/getAllVeganSnacks')}
+          >
+            <span className="apply__back-arrow" aria-hidden="true">
+              ←
+            </span>
+            Back
+          </button>
+
+          <header className="apply__header">
+            <p className="section-heading__eyebrow">New catalogue entry</p>
+            <h1 className="apply__title">Add a Vegan Snack</h1>
+            <p className="apply__lead">
+              Capture the details of a vegan snack and it joins the catalogue straight
+              away, together with its freshness badge and inventory value.
+            </p>
+          </header>
+
+          {submitError && (
+            <div className="form-banner form-banner--error" role="alert">
+              <p className="form-banner__title">We could not add your snack</p>
+              <p className="form-banner__message">{submitError}</p>
+            </div>
+          )}
+
+          <form className="snack-form" onSubmit={submit} noValidate>
+            {FIELDS.map((field) => {
+              const fieldError = errors[field.name];
+              const errorId = `${field.name}-error`;
+
+              return (
+                <div
+                  className={`form-field${fieldError ? ' form-field--invalid' : ''}`}
+                  key={field.name}
+                >
+                  <div className="form-field__header">
+                    <label className="form-field__label" htmlFor={field.name}>
+                      {field.label}
+                    </label>
+
+                    {field.name === 'snackName' && (
+                      <span className="form-field__counter" aria-live="polite">
+                        {nameLength}/{NAME_MAX_LENGTH}
+                      </span>
+                    )}
+                  </div>
+
+                  <input
+                    className="form-field__input"
+                    id={field.name}
+                    name={field.name}
+                    type={field.type}
+                    placeholder={field.placeholder}
+                    value={values[field.name]}
+                    onChange={handleChange}
+                    autoComplete={field.autoComplete}
+                    min={field.min}
+                    step={field.step}
+                    maxLength={field.maxLength}
+                    aria-invalid={fieldError ? 'true' : undefined}
+                    aria-describedby={fieldError ? errorId : undefined}
+                  />
+
+                  {fieldError && (
+                    <small className="field-error" id={errorId}>
+                      {fieldError}
+                    </small>
+                  )}
+                </div>
+              );
+            })}
+
+            <div className="snack-form__actions">
+              <button className="button button--primary button--large" type="submit" disabled={isSubmitting}>
+                {isSubmitting ? 'Submitting…' : 'Submit'}
+              </button>
+              <button
+                className="button button--ghost"
+                type="button"
+                onClick={() => navigate('/getAllVeganSnacks')}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <aside className="apply__aside" aria-label="Snack preview">
+          <div className="preview-card">
+            <p className="preview-card__label">Live preview</p>
+            <h2 className="preview-card__title">
+              {values.snackName.trim() || 'Your new snack'}
+            </h2>
+            <p className="preview-card__type">
+              {values.snackType.trim() || 'Category not set yet'}
+            </p>
+
+            <dl className="preview-card__list">
+              <div className="preview-card__row">
+                <dt>Quantity</dt>
+                <dd>{values.quantity === '' ? '—' : formatQuantity(values.quantity)}</dd>
+              </div>
+              <div className="preview-card__row">
+                <dt>Price</dt>
+                <dd>{values.price === '' ? '—' : formatCurrency(values.price)}</dd>
+              </div>
+              <div className="preview-card__row">
+                <dt>Expiry</dt>
+                <dd>
+                  {values.expiryInMonths === '' ? '—' : formatExpiry(values.expiryInMonths)}
+                </dd>
+              </div>
+            </dl>
+
+            <p className="preview-card__hint">
+              The preview updates as you type and mirrors how the snack appears in the
+              catalogue.
+            </p>
+          </div>
+        </aside>
+      </div>
+    </section>
+  );
 }
+
 export default ApplyForm;
