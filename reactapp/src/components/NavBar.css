@@ -1,15 +1,79 @@
 /* ==========================================================================
-   Sticky application header and primary navigation.
+   Fixed application header and primary navigation.
+
+   The header floats above the page and takes one of three surfaces:
+
+   - overlay : fully transparent, the hero artwork shows through it
+   - deep    : translucent green, used once the page is scrolled
+   - solid   : the light application surface used on every other route
+
+   The colours of the navigation are driven by the custom properties below, so
+   a single set of rules covers all three surfaces.
    ========================================================================== */
 
 .site-header {
-  position: sticky;
+  position: fixed;
   top: 0;
+  right: 0;
+  left: 0;
   z-index: 100;
   border-bottom: 1px solid var(--hairline);
   background: rgba(251, 250, 244, 0.86);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  transition:
+    background-color var(--transition),
+    border-color var(--transition),
+    box-shadow var(--transition);
+}
+
+/* The transparent surface of the landing page. ---------------------------- */
+
+.site-header--overlay {
+  border-bottom-color: transparent;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* The translucent surface used while the hero artwork is still in view. --- */
+
+.site-header--deep {
+  border-bottom-color: rgba(251, 250, 244, 0.12);
+  background: rgba(7, 28, 19, 0.72);
+  box-shadow: 0 10px 30px rgba(7, 28, 19, 0.24);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* The light surface used on every route without a dark hero. -------------- */
+
+.site-header--solid {
+  border-bottom-color: var(--hairline);
+  background: rgba(251, 250, 244, 0.86);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/*
+ * Colours of the navigation per surface. The dark surfaces sit on the deep
+ * green hero, so the type turns light and the pills become translucent.
+ */
+.site-header--overlay,
+.site-header--deep {
+  --header-fg:rgba(251, 250, 244, 0.82);
+  --header-fg-strong:var(--white);
+  --header-chip:rgba(251, 250, 244, 0.14);
+  --header-chip-strong:rgba(251, 250, 244, 0.22);
+  --header-divider:rgba(251, 250, 244, 0.16);
+}
+
+.site-header--solid {
+  --header-fg:var(--ink-600);
+  --header-fg-strong:var(--green-900);
+  --header-chip:var(--cream-100);
+  --header-chip-strong:var(--cream-200);
+  --header-divider:var(--hairline);
 }
 
 .site-nav {
@@ -31,7 +95,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.65rem;
-  color: var(--green-900);
+  color: var(--header-fg-strong);
   font-family: var(--font-display);
   font-size: 1.02rem;
   font-weight: 600;
@@ -39,6 +103,7 @@
   line-height: 1.2;
   text-decoration: none;
   white-space: nowrap;
+  transition: color var(--transition);
 }
 
 .brand__mark {
@@ -69,7 +134,7 @@
   align-items: center;
   padding: 0.5rem 0.85rem;
   border-radius: var(--radius-pill);
-  color: var(--ink-600);
+  color: var(--header-fg);
   font-size: 0.92rem;
   font-weight: 600;
   text-decoration: none;
@@ -79,13 +144,13 @@
 }
 
 .nav-link:hover {
-  background: var(--cream-100);
-  color: var(--green-800);
+  background: var(--header-chip);
+  color: var(--header-fg-strong);
 }
 
 .nav-link.active {
-  background: var(--cream-200);
-  color: var(--green-900);
+  background: var(--header-chip-strong);
+  color: var(--header-fg-strong);
 }
 
 /* The call to action is the last item on every viewport. */
@@ -105,6 +170,30 @@
   background: linear-gradient(135deg, var(--green-800), var(--green-700));
   box-shadow: var(--shadow-md);
   color: var(--white);
+}
+
+/*
+ * Over the dark hero the green call to action would blend into the artwork,
+ * so it switches to the lime accent with a deep green label.
+ */
+.site-header--overlay .nav-list__item--cta .nav-link,
+.site-header--deep .nav-list__item--cta .nav-link {
+  background: linear-gradient(135deg, var(--leaf-400), var(--lime-300));
+  box-shadow: 0 8px 20px rgba(11, 46, 31, 0.3);
+  color: var(--green-950);
+}
+
+.site-header--overlay .nav-list__item--cta .nav-link:hover,
+.site-header--deep .nav-list__item--cta .nav-link:hover {
+  background: linear-gradient(135deg, var(--lime-300), var(--leaf-400));
+  color: var(--green-950);
+}
+
+.site-header--overlay .nav-list__item--cta .nav-link.active,
+.site-header--deep .nav-list__item--cta .nav-link.active {
+  background: linear-gradient(135deg, var(--lime-300), var(--leaf-400));
+  box-shadow: 0 10px 26px rgba(11, 46, 31, 0.34);
+  color: var(--green-950);
 }
 
 @media (max-width: 720px) {

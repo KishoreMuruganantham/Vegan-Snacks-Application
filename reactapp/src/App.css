@@ -17,6 +17,12 @@
 .app-main {
   flex: 1 0 auto;
   width: 100%;
+  /*
+   * The header floats above the page, so the routed content starts below it.
+   * The landing page cancels this offset again so that its hero artwork can
+   * reach the top of the viewport behind the transparent header.
+   */
+  padding-top: var(--header-h);
 }
 
 /* Toast notifications ----------------------------------------------------- */

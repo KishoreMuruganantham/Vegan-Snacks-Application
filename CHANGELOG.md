@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.1] - 2026-11-13
+
+### Changed
+
+- The application header now floats above the page and adapts to whatever
+  sits behind it:
+  - on the landing page it is **fully transparent**, so the deep green hero
+    artwork is visible straight through it;
+  - once the page is scrolled it takes on a translucent green surface so the
+    navigation keeps its contrast over the artwork;
+  - on every other route it keeps the light surface of the application.
+- The navigation colours are driven by custom properties per surface, so the
+  light type of the dark hero and the dark type of the light pages share a
+  single set of rules.
+- The call to action switches to the lime accent while it sits on the dark
+  hero, which keeps it separated from the artwork.
+
+### Added
+
+- The header measures itself with a `ResizeObserver` and publishes its height
+  as the `--header-h` custom property. The page offset therefore stays exact
+  on every viewport, including the narrow layouts where the navigation wraps
+  onto a second row.
+- A `--header-h` design token with a fallback value for the first paint.
+
+### Fixed
+
+- The three floating cards of the hero overlapped each other on wide
+  viewports, which clipped the text of the middle card. The column now
+  reserves enough height and the cards are spread over it with explicit
+  stacking order.
+
+---
+
 ## [1.1.0] - 2026-11-13
 
 The full engineering release. The functional skeleton shipped in `1.0.0` is

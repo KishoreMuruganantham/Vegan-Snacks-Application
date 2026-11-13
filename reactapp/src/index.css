@@ -63,6 +63,14 @@
   --gutter:clamp(1rem, 4vw, 2.5rem);
   --section-gap:clamp(3rem, 7vw, 5.5rem);
   --transition:180ms cubic-bezier(.2,.7,.3,1);
+
+  /*
+   * Height of the fixed application header. The header measures itself at
+   * runtime and writes the result into this custom property, which keeps the
+   * page offset exact even when the navigation wraps onto a second row.
+   * The value below is the fallback used before the first measurement.
+   */
+  --header-h:4.25rem;
 }
 
 *,

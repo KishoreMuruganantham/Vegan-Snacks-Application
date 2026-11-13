@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import './NavBar.css';
 
 /**
@@ -42,10 +42,67 @@ const BrandMark = () => (
 
 /**
  * Sticky application header with the brand mark and the primary navigation.
+ *
+ * The header floats above the page and adapts to what sits behind it:
+ *
+ * - `overlay` - on the landing page the hero artwork reaches the top of the
+ *   viewport, so the header stays fully transparent and the deep green hero
+ *   is visible through it.
+ * - `deep` - once the page is scrolled the header gains a translucent green
+ *   surface so the navigation keeps its contrast over the artwork.
+ * - `solid` - on every other route the header uses the light surface of the
+ *   application.
  */
 function NavBar() {
+  const location = useLocation();
+  const headerRef = useRef(null);
+  const [scrolled, setScrolled] = useState(false);
+
+  /*
+   * The header is taken out of the flow, so the page has to be offset by its
+   * exact height. Measuring it here and publishing the result as a custom
+   * property keeps that offset correct on every viewport, including the
+   * narrow layouts where the navigation wraps onto a second row.
+   */
+  useEffect(() => {
+    const node = headerRef.current;
+    if (!node) {
+      return undefined;
+    }
+
+    const publishHeight = () => {
+      document.documentElement.style.setProperty('--header-h', `${node.offsetHeight}px`);
+    };
+
+    publishHeight();
+
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', publishHeight);
+      return () => window.removeEventListener('resize', publishHeight);
+    }
+
+    const observer = new ResizeObserver(publishHeight);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  /*
+   * Track the scroll offset. The listener is re-attached on every route change
+   * so the state always reflects the position of the page that is shown.
+   */
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 16);
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [location.pathname]);
+
+  const overHero = location.pathname === '/';
+  const variant = overHero ? (scrolled ? 'site-header--deep' : 'site-header--overlay') : 'site-header--solid';
+
   return (
-    <header className="site-header">
+    <header className={`site-header ${variant}`} ref={headerRef}>
       <nav className="site-nav" aria-label="Primary">
         <div className="site-nav__inner">
           <Link to="/" className="brand">

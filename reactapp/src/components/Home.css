@@ -4,6 +4,12 @@
 
 .home {
   display: block;
+  /*
+   * The landing page cancels the offset that reserves room for the fixed
+   * header, so the hero artwork reaches the top of the viewport and is
+   * visible through the transparent header.
+   */
+  margin-top: calc(var(--header-h) * -1);
 }
 
 /* Hero -------------------------------------------------------------------- */
@@ -11,6 +17,8 @@
 .hero {
   position: relative;
   overflow: hidden;
+  /* Keeps the hero content clear of the floating header. */
+  padding-top: var(--header-h);
   background:
     radial-gradient(120% 90% at 8% 0%, rgba(143, 220, 161, 0.22) 0%, transparent 55%),
     radial-gradient(90% 80% at 92% 12%, rgba(195, 240, 92, 0.18) 0%, transparent 58%),
@@ -40,7 +48,7 @@
 }
 
 .hero__leaf--one {
-  top: -3.5rem;
+  top: -1rem;
   right: -2.5rem;
   width: clamp(11rem, 26vw, 20rem);
   transform: rotate(18deg);
@@ -174,7 +182,11 @@
 
 .hero__visual {
   position: relative;
-  min-height: 20rem;
+  /*
+   * The three floating cards are placed absolutely, so the column needs a
+   * height that leaves room for all of them without letting them collide.
+   */
+  min-height: 26rem;
 }
 
 .hero-card {
@@ -190,19 +202,22 @@
 }
 
 .hero-card--primary {
+  z-index: 1;
   top: 0;
-  left: 4%;
+  left: 3%;
   background: rgba(251, 250, 244, 0.13);
 }
 
 .hero-card--secondary {
-  top: 38%;
+  z-index: 2;
+  top: 34%;
   right: 0;
 }
 
 .hero-card--tertiary {
+  z-index: 3;
   bottom: 0;
-  left: 12%;
+  left: 10%;
 }
 
 .hero-card__label {
@@ -511,7 +526,7 @@
   }
 
   .hero__visual {
-    min-height: 17rem;
+    min-height: 24rem;
     max-width: 26rem;
   }
 }
@@ -527,7 +542,7 @@
   }
 
   .hero__visual {
-    min-height: 15rem;
+    min-height: 22rem;
   }
 
   .hero-card {
