@@ -596,6 +596,17 @@ vercel --prod
 The Vercel project is configured entirely by `reactapp/vercel.json`, so no
 dashboard changes are needed.
 
+Automatic deployments on every push need the
+[Vercel GitHub App](https://vercel.com/docs/git) to be installed for the
+repository. Connect it with:
+
+```bash
+cd reactapp
+vercel git connect https://github.com/KishoreMuruganantham/Vegan-Snacks-Application
+```
+
+Until then, redeploy with `vercel --prod`.
+
 ### Cost
 
 The project runs on the **Vercel Hobby plan**, which is free:
